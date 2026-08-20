@@ -1,0 +1,13 @@
+services:
+  # caddy: # see caddy master repo gitlab.com/mredig/caddy-master
+
+  markdown-demo:
+    image: ghcr.io/mredig/markdowndemo2:latest
+    # there are no settings configured here because its defaults point to Notes-to-Self as a demo, which is what I want
+    restart: unless-stopped
+    networks:
+      - caddy_proxy
+
+networks:
+  caddy_proxy:
+    external: true
