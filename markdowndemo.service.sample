@@ -1,0 +1,32 @@
+# Install on the server (run from this repo directory):
+#   1. cp markdowndemo.service.sample markdowndemo.service
+#   2. Edit every path marked "EDIT:" in markdowndemo.service
+#   3. systemctl link /ABS/PATH/TO/THIS/REPO/markdowndemo.service
+#   4. systemctl daemon-reload
+#   5. systemctl enable --now markdowndemo.service
+#
+# `systemctl link` symlinks the (gitignored) .service from this repo dir into
+# /etc/systemd/system, so the unit loads from the repo and git edits apply
+# after a daemon-reload.
+
+[Unit]
+Description=Markdowndemo stack (podman + docker-compose)
+After=network-online.target podman.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+# EDIT if your podman docker-compatible socket lives elsewhere:
+Environment=DOCKER_HOST=unix:///run/podman/podman.sock
+# EDIT: absolute path to this repo's checkout on the server
+WorkingDirectory=/opt/markdowndemo
+# EDIT: absolute path to the docker-compose binary
+ExecStart=/usr/bin/docker-compose up
+# EDIT: absolute path to the docker-compose binary
+ExecStop=/usr/bin/docker-compose down
+# if the whole stack dies, the foreground `up` exits non-zero and systemd relaunches it
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
